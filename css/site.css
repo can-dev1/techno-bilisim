@@ -909,13 +909,16 @@ body:has(.theme-toggle:not([hidden])) header nav { margin-left:auto; }
     width:52px;
     height:52px;
     padding:0;
-    border:1px solid #d6dfdf;
+    border:0;
     border-radius:12px;
-    background:#fff;
-    color:#163a49;
-    box-shadow:0 4px 18px #0002;
-    font-size:28px;
+    background:transparent;
+    color:#fff;
+    text-shadow:0 1px 5px #0009;
+    font-size:34px;
   }
+  body:has(header.scrolled) .menu-toggle { color:#163a49; text-shadow:none; }
+  :root[data-theme=dark] body:has(header.scrolled) .menu-toggle { color:#fff; }
+  .menu-toggle[aria-expanded=true] { color:#163a49 !important; text-shadow:none; }
   html.menu-enabled { scroll-padding-top:24px; }
   html.menu-enabled header {
     inset:0 0 0 auto;
@@ -936,7 +939,7 @@ body:has(.theme-toggle:not([hidden])) header nav { margin-left:auto; }
   }
   html.menu-enabled header.menu-open { visibility:visible; transform:none; }
   html.menu-enabled header .brand { align-self:center; }
-  html.menu-enabled header .brand img { width:170px; height:170px; filter:none; }
+  html.menu-enabled header .brand img { width:clamp(170px,50vw,195px); height:auto; filter:none; }
   html.menu-enabled header nav {
     flex:none;
     flex-direction:column;
