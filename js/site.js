@@ -1,3 +1,24 @@
+const themeButton = document.querySelector('.theme-toggle');
+const systemTheme = window.matchMedia('(prefers-color-scheme: dark)');
+let savedTheme;
+try { savedTheme = localStorage.getItem('theme'); } catch {}
+function setTheme(dark) {
+  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  themeButton.setAttribute('aria-pressed', String(dark));
+  themeButton.setAttribute('aria-label', dark ? 'Aydınlık temaya geç' : 'Karanlık temaya geç');
+  themeButton.textContent = dark ? '☀' : '☾';
+}
+setTheme(savedTheme === 'dark' || (savedTheme !== 'light' && systemTheme.matches));
+themeButton.hidden = false;
+themeButton.addEventListener('click', () => {
+  savedTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  setTheme(savedTheme === 'dark');
+  try { localStorage.setItem('theme', savedTheme); } catch {}
+});
+systemTheme.addEventListener('change', event => {
+  if (savedTheme !== 'light' && savedTheme !== 'dark') setTheme(event.matches);
+});
+
 const header = document.querySelector('header');
 function updateHeader() {
   header.classList.toggle('scrolled', window.scrollY > 0);
@@ -5,6 +26,30 @@ function updateHeader() {
 window.addEventListener('scroll', updateHeader, { passive: true });
 window.addEventListener('pageshow', updateHeader);
 updateHeader();
+
+const menuButton = document.querySelector('.menu-toggle');
+document.documentElement.classList.add('menu-enabled');
+menuButton.hidden = false;
+function setMenu(open) {
+  header.classList.toggle('menu-open', open);
+  menuButton.setAttribute('aria-expanded', String(open));
+  menuButton.setAttribute('aria-label', open ? 'Menüyü kapat' : 'Menüyü aç');
+  menuButton.textContent = open ? '×' : '☰';
+}
+menuButton.addEventListener('click', () => setMenu(menuButton.getAttribute('aria-expanded') !== 'true'));
+header.addEventListener('click', event => {
+  if (event.target.closest('a')) setMenu(false);
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') {
+    setMenu(false);
+    menuButton.focus();
+  }
+});
+document.addEventListener('click', event => {
+  if (!header.contains(event.target) && !menuButton.contains(event.target)) setMenu(false);
+});
+window.matchMedia('(max-width: 760px)').addEventListener('change', () => setMenu(false));
 
 const filters = document.querySelectorAll('.filter button');
 const records = document.querySelectorAll('.record');
