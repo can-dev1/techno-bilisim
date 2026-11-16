@@ -910,7 +910,8 @@ body:has(.theme-toggle:not([hidden])) header nav { margin-left:auto; }
     line-height:0;
   }
   .mobile-brand img { display:block; width:100%; height:auto; }
-  body:has(header.menu-open) .mobile-brand { visibility:hidden; }
+  body:has(header.menu-open) .mobile-brand,
+  body:has(header.scrolled) .mobile-brand { visibility:hidden; }
   html.menu-enabled { scroll-padding-top:140px; }
   .menu-toggle:not([hidden]) {
     position:fixed;
