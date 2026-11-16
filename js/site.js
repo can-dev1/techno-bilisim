@@ -20,6 +20,66 @@ for (const button of filters) {
   });
 }
 
+const photoDescriptions = [
+  ['Robotik Kodlama', 'ÜNİDES kapsamında düzenlenen bu yarışmada öğrenci takımları robotik prototiplerini görev parkurunda test etti; etkinlik, algoritmik düşünme ve donanım programlama becerilerini geliştiren uygulamalı bir deneyim sundu.'],
+  ['1. Sınıflara Oryantasyon', 'Yeni öğrencilerin ders işleyişini, sınav sistemini ve kulüp komisyonlarını tanıdığı bu buluşma, üniversite yaşamına ve kulüp faaliyetlerine uyumu destekledi.'],
+  ['Çiğ Köfte', 'Dönem başında öğrencilerin bir araya geldiği bu sosyal buluşma, farklı sınıflar arasında tanışmayı, kaynaşmayı ve kulüp etkinliklerine katılımı güçlendirdi.'],
+  ['Stant Haftası', 'Kulüp projeleri ve etkinlik takvimi kampüs genelinde tanıtılarak öğrencilerle yüz yüze iletişim kuruldu; yeni üyeler kazanıldı ve kulüp ağı genişletildi.'],
+  ['Siber Farkındalık', 'Oltalama saldırıları, parola güvenliği ve veri mahremiyeti üzerine gerçekleştirilen eğitim, öğrencilerin günlük dijital güvenlik farkındalığını artırdı.'],
+  ['Vize Sonrası Konser', 'Sınav döneminin ardından düzenlenen canlı müzik etkinliği, öğrencilerin sosyal ve kültürel olarak dinlenmesini sağlarken kampüs içi etkileşimi güçlendirdi.'],
+  ['Bilardo Turnuvası', 'Üniversite öğrencilerinin karşılaşmalarla bir araya geldiği turnuva, sportmenliği ve sosyal etkileşimi destekledi; yoğun katılım kulübün spor etkinliklerini geliştirmesine katkı sağladı.'],
+  ['AI WINTER', 'Yapay zekâ alanındaki güncel gelişmelerin sunum, panel ve soru-cevap oturumlarıyla ele alındığı zirve, bilimsel paylaşım ve yeni proje fikirleri için ortak bir ortam oluşturdu.'],
+  ['KUDAAKAF', 'Kulüp üyeleri ve bölüm öğrencileri kariyer fuarında firma stantlarını ziyaret ederek staj ve iş olanaklarını inceledi; insan kaynakları görüşmeleriyle kariyer bağlantıları kuruldu.'],
+  ['Tanışma Etkinliği', 'Yeni ve mevcut kulüp üyelerinin yönetim ekibiyle buluştuğu etkinlikte çalışma komisyonları ve dönem takvimi tanıtıldı; aktif görev dağılımı oluşturuldu.'],
+  ['Faaliyet arşivinden ek kareler', 'Kulübün eğitim, yarışma, zirve, tanışma, sosyal sorumluluk ve kampüs etkinliklerinden seçilen bu kareler; öğrencilerin birlikte öğrenme, üretme ve paylaşma sürecini yansıtıyor.'],
+  ['Yeni etkinlik fotoğrafları', 'Kulübün teknoloji, eğitim, yarışma, zirve ve sosyal etkinliklerinden seçilen bu fotoğraflar; öğrencilerin birlikte öğrenme, üretme ve kulüp yaşamına katılma sürecini yansıtıyor.']
+];
+for (const record of document.querySelectorAll('.record')) {
+  if (record.querySelector('h3')?.textContent.includes('Faaliyet arşivinden ek kareler')) record.remove();
+}
+for (const meta of document.querySelectorAll('.record .meta')) meta.remove();
+for (const record of document.querySelectorAll('.record:has(.event-gallery)')) {
+  const gallery = record.querySelector('.event-gallery');
+  const heading = record.querySelector('h3')?.textContent.trim() || '';
+  const match = photoDescriptions.find(([keyword]) => heading.includes(keyword));
+  for (const paragraph of record.querySelectorAll(':scope > div > p')) paragraph.remove();
+  if (gallery && match) {
+    const description = document.createElement('p');
+    description.className = 'photo-description';
+    description.textContent = match[1];
+    gallery.before(description);
+  }
+}
+
+for (const gallery of document.querySelectorAll('.event-gallery')) {
+  const photos = gallery.querySelectorAll(':scope > a');
+  if (photos.length < 2) continue;
+  const controls = document.createElement('div');
+  controls.className = 'gallery-controls';
+  const previous = document.createElement('button');
+  const next = document.createElement('button');
+  previous.textContent = '← Önceki';
+  next.textContent = 'Sonraki →';
+  previous.setAttribute('aria-label', 'Önceki fotoğraf');
+  next.setAttribute('aria-label', 'Sonraki fotoğraf');
+  for (const button of [previous, next]) button.type = 'button';
+  function movePhoto(direction) {
+    const step = photos[0].getBoundingClientRect().width + parseFloat(getComputedStyle(gallery).columnGap);
+    gallery.scrollBy({ left: direction * step, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+  }
+  function updateGalleryControls() {
+    previous.disabled = gallery.scrollLeft <= 2;
+    next.disabled = gallery.scrollLeft >= gallery.scrollWidth - gallery.clientWidth - 2;
+  }
+  previous.addEventListener('click', () => movePhoto(-1));
+  next.addEventListener('click', () => movePhoto(1));
+  gallery.addEventListener('scroll', updateGalleryControls, { passive: true });
+  window.addEventListener('resize', updateGalleryControls);
+  controls.append(previous, next);
+  gallery.after(controls);
+  updateGalleryControls();
+}
+
 const videos = document.querySelectorAll('video');
 const films = document.querySelector('.films');
 const rotationButton = document.querySelector('.film-rotation');
